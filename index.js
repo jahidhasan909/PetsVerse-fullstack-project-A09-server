@@ -20,33 +20,45 @@ const client = new MongoClient(uri, {
 
 
 const run = async () => {
-    await client.connect();
+    try {
+        await client.connect();
 
 
 
-    const database = client.db('pets')
-    const petscollaction = database.collection('petsinformation')
+        const database = client.db('pets')
+        const petscollaction = database.collection('petsinformation')
 
 
-    app.post('/pets', async (req, res) => {
-        const docs = req.body
+        app.post('/pets', async (req, res) => {
+            const docs = req.body
 
 
-        const result = await petscollaction.insertOne(docs)
-        res.send(result)
-    })
+            const result = await petscollaction.insertOne(docs)
+            res.send(result)
+        })
 
 
-    app.get('/allpets', async (req, res) => {
-        const cursor = await petscollaction.find().toArray()
-        res.send(cursor)
-    })
-   
-    app.get('/ownpetslisting/:ownerId', async (req, res) => {
-        const { ownerId } = req.params
-        const cursor = await petscollaction.find({ ownerId: ownerId }).toArray()
-        res.send(cursor)
-    })
+        app.get('/allpets', async (req, res) => {
+            const cursor = await petscollaction.find().toArray()
+            res.send(cursor)
+        })
+
+        app.get('/allpets/:id', async (req, res) => {
+            const { id } = req.params
+            console.log(req.params, 'params');
+
+            const query = {
+                _id: new ObjectId(id)
+            }
+            const result = await petscollaction.findOne(query)
+            res.send(result)
+        })
+
+        app.get('/ownpetslisting/:ownerId', async (req, res) => {
+            const { ownerId } = req.params
+            const cursor = await petscollaction.find({ ownerId: ownerId }).toArray()
+            res.send(cursor)
+        })
 
 
 
@@ -55,8 +67,11 @@ const run = async () => {
 
 
 
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+        //   await client.close();
+    }
 }
 
 run().catch(console.dir);
