@@ -63,6 +63,17 @@ const run = async () => {
             res.send(result)
         })
 
+
+        app.get('/adopt', async (req, res) => {
+            const email = req.query.email
+            const query = {
+                userEmail: email
+            }
+            const cursor = await adoptpetscollaction.find(query).toArray()
+            res.send(cursor)
+        })
+
+
         app.patch('/allpets/:id', async (req, res) => {
             const { id } = req.params
             const filter = {
