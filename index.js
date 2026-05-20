@@ -185,6 +185,25 @@ const run = async () => {
 
 
 
+
+
+        app.patch('/ownpetslisting/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = {
+                _id: new ObjectId(id)
+            }
+            const docs = req.body
+
+            const result = await petscollaction.updateOne(filter, { $set: docs })
+
+            res.send(result)
+        })
+
+
+
+
+
+
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
