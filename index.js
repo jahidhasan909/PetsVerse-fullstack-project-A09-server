@@ -107,8 +107,60 @@ const run = async () => {
 
 
 
+        app.patch('/adopt/:id', async (req, res) => {
 
+            try {
 
+                const { id } = req.params;
+
+                const { status, petsId } = req.body;
+
+                // console.log(id);
+                // console.log(status);
+                // console.log(petsId);
+
+               
+                const filter = {
+                    _id: new ObjectId(id)
+                };
+
+                const updateDoc = {
+                    $set: {
+                        status: status
+                    }
+                };
+
+                const result = await adoptpetscollaction.updateOne(
+                    filter,
+                    updateDoc
+                );
+
+               
+                if (status === "approved") {
+
+                    await petscollaction.updateOne(
+                        {
+                            _id: new ObjectId(petsId)
+                        },
+                        {
+                            $set: {
+                                status: "adopted"
+                            }
+                        }
+                    );
+                }
+
+                res.send(result);
+
+            } catch (error) {
+
+                console.log(error);
+
+                res.status(500).send({
+                    message: "server error"
+                });
+            }
+        });
 
 
 
