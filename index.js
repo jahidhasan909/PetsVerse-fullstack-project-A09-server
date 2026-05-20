@@ -96,6 +96,17 @@ const run = async () => {
 
 
 
+        app.get('/adopt/:petsId', async (req, res) => {
+            const { petsId } = req.params;
+
+            const query = { petsId };
+
+            const result = await adoptpetscollaction.find(query).toArray();
+            res.send(result);
+        });
+
+
+
 
 
 
