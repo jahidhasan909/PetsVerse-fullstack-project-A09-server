@@ -27,6 +27,7 @@ const run = async () => {
 
         const database = client.db('pets')
         const petscollaction = database.collection('petsinformation')
+        const adoptpetscollaction = database.collection('adoptpets')
 
 
         app.post('/pets', async (req, res) => {
@@ -53,6 +54,28 @@ const run = async () => {
             const result = await petscollaction.findOne(query)
             res.send(result)
         })
+
+
+        app.post('/adopt', async (req, res) => {
+            const docs = req.body
+
+            const result = await adoptpetscollaction.insertOne(docs)
+            res.send(result)
+        })
+
+        app.patch('/allpets/:id', async (req, res) => {
+            const { id } = req.params
+            const filter = {
+                _id: new ObjectId(id)
+            }
+            const docs = req.body
+
+            const result = await petscollaction.updateOne(filter, { $set: docs })
+
+            res.send(result)
+        })
+
+
 
         app.get('/ownpetslisting/:ownerId', async (req, res) => {
             const { ownerId } = req.params
