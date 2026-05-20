@@ -119,7 +119,7 @@ const run = async () => {
                 // console.log(status);
                 // console.log(petsId);
 
-               
+
                 const filter = {
                     _id: new ObjectId(id)
                 };
@@ -135,7 +135,7 @@ const run = async () => {
                     updateDoc
                 );
 
-               
+
                 if (status === "approved") {
 
                     await petscollaction.updateOne(
@@ -161,6 +161,27 @@ const run = async () => {
                 });
             }
         });
+
+
+
+
+        app.delete('/adopt/:petsId', async (req, res) => {
+            const { petsId } = req.params
+            const filter = {
+                _id: new ObjectId(petsId)
+            }
+            const result = await adoptpetscollaction.deleteOne(filter)
+            res.send(result)
+        })
+
+        app.delete('/ownpetslisting/:id', async (req, res) => {
+            const { id } = req.params
+            const filter = {
+                _id: new ObjectId(id)
+            }
+            const result = await petscollaction.deleteOne(filter)
+            res.send(result)
+        })
 
 
 
