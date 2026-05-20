@@ -40,8 +40,38 @@ const run = async () => {
 
 
         app.get('/allpets', async (req, res) => {
-            const cursor = await petscollaction.find().toArray()
+
+
+            const search = req.query.search
+            const species = req.query.species
+
+            let query = {};
+
+
+            if (search) {
+                query.petName = {
+                    $regex: search,
+                    $options: 'i'
+                }
+            }
+
+
+            if (species) {
+                query.species = {
+                    $in: [species]
+                }
+            }
+
+
+            const cursor = await petscollaction.find(query).toArray()
             res.send(cursor)
+
+
+
+
+
+
+
         })
 
         app.get('/allpets/:id', async (req, res) => {
