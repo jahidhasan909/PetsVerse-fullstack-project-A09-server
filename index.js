@@ -3,6 +3,7 @@ const app = express()
 const PORT = process.env.PORT || 8000
 const cors = require('cors');
 require('dotenv').config()
+const { createRemoteJWKSet, jwtVerify } = require('jose-cjs');
 
 app.use(cors())
 app.use(express.json())
@@ -17,6 +18,41 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     }
 });
+
+
+
+
+
+
+
+const jWKS = createRemoteJWKSet(new URL(process.env.JWKSUSER_URI))
+
+const vrifyToken = async (req, res, next) => {
+
+    const authHader = req?.headers.authorization
+    if (!authHader) {
+        return res.status(401).json({ meassage: 'unauthorizte' })
+    }
+    const token = authHader.split(" ")[1]
+    if (!token) {
+        return res.status(403).json({ meassage: 'unauthorizte' })
+    }
+
+
+    try {
+        const { payload } = await jwtVerify(token, jWKS)
+        console.log(payload);
+
+        next()
+    } catch (e) {
+        return res.status(401).json({ meassage: 'Forbiden' })
+    }
+
+}
+
+
+
+
 
 
 const run = async () => {
@@ -74,9 +110,9 @@ const run = async () => {
 
         })
 
-        app.get('/allpets/:id', async (req, res) => {
+        app.get('/allpets/:id', vrifyToken, async (req, res) => {
             const { id } = req.params
-            console.log(req.params, 'params');
+            // console.log(req.params, 'params');
 
             const query = {
                 _id: new ObjectId(id)
@@ -94,7 +130,7 @@ const run = async () => {
         })
 
 
-        app.get('/adopt', async (req, res) => {
+        app.get('/adopt',vrifyToken, async (req, res) => {
             const email = req.query.email
             const query = {
                 userEmail: email
@@ -104,7 +140,7 @@ const run = async () => {
         })
 
 
-        app.patch('/allpets/:id', async (req, res) => {
+        app.patch('/allpets/:id',vrifyToken, async (req, res) => {
             const { id } = req.params
             const filter = {
                 _id: new ObjectId(id)
@@ -118,7 +154,7 @@ const run = async () => {
 
 
 
-        app.get('/ownpetslisting/:ownerId', async (req, res) => {
+        app.get('/ownpetslisting/:ownerId', vrifyToken, async (req, res) => {
             const { ownerId } = req.params
             const cursor = await petscollaction.find({ ownerId: ownerId }).toArray()
             res.send(cursor)
@@ -126,7 +162,7 @@ const run = async () => {
 
 
 
-        app.get('/adopt/:petsId', async (req, res) => {
+        app.get('/adopt/:petsId', vrifyToken, async (req, res) => {
             const { petsId } = req.params;
 
             const query = { petsId };
@@ -195,7 +231,7 @@ const run = async () => {
 
 
 
-        app.delete('/adopt/:petsId', async (req, res) => {
+        app.delete('/adopt/:petsId',vrifyToken, async (req, res) => {
             const { petsId } = req.params
             const filter = {
                 _id: new ObjectId(petsId)
@@ -204,7 +240,7 @@ const run = async () => {
             res.send(result)
         })
 
-        app.delete('/ownpetslisting/:id', async (req, res) => {
+        app.delete('/ownpetslisting/:id',vrifyToken, async (req, res) => {
             const { id } = req.params
             const filter = {
                 _id: new ObjectId(id)
@@ -217,7 +253,7 @@ const run = async () => {
 
 
 
-        app.patch('/ownpetslisting/:id', async (req, res) => {
+        app.patch('/ownpetslisting/:id',vrifyToken, async (req, res) => {
             const id = req.params.id
             const filter = {
                 _id: new ObjectId(id)
