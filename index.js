@@ -66,7 +66,7 @@ const run = async () => {
         const adoptpetscollaction = database.collection('adoptpets')
 
 
-        app.post('/pets', async (req, res) => {
+        app.post('/pets',vrifyToken, async (req, res) => {
             const docs = req.body
 
 
@@ -122,7 +122,7 @@ const run = async () => {
         })
 
 
-        app.post('/adopt', async (req, res) => {
+        app.post('/adopt',vrifyToken, async (req, res) => {
             const docs = req.body
 
             const result = await adoptpetscollaction.insertOne(docs)
@@ -223,7 +223,7 @@ const run = async () => {
                 console.log(error);
 
                 res.status(500).send({
-                    message: "server error"
+                    message: "Internal server error"
                 });
             }
         });
