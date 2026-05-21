@@ -31,6 +31,7 @@
 4. JWT Authentication
 5. dotenv
 6. cors
+7. jose-cjs (npm p)
 
 
 
